@@ -6,18 +6,14 @@ import { signIn } from 'next-auth/react'
 
 export default function LoginPage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
+  
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
 
-  useEffect(() => {
-    if (searchParams.get('error')) {
-      setError('Invalid email or password')
-    }
-  }, [searchParams])
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

@@ -14,7 +14,9 @@ export const authOptions:NextAuthOptions=
         },
 
         async authorize(credentials)
+
         {
+            console.log('authorize called', credentials)
             const user=await prisma.user.findUnique({
                 where:{email:credentials?.email}
             })
@@ -52,9 +54,7 @@ export const authOptions:NextAuthOptions=
     },
     pages:{
         signIn:'/login',
-        error:'/login'
         
-
     },
     session:{
         strategy:'jwt'
