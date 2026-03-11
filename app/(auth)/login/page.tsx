@@ -1,18 +1,28 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn } from 'next-auth/react'
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
+  const [loading, setLoading] = useState<boolean>(false)
+
+  useEffect(() => {
+    if (searchParams.get('error')) {
+      setError('Invalid email or password')
+    }
+  }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setLoading(true)
+    setError('')
 
     const res = await signIn('credentials', {
       email,
@@ -22,63 +32,90 @@ export default function LoginPage() {
 
     if (res?.error) {
       setError('Invalid email or password')
+      setLoading(false)
     } else {
       router.push('/dashboard')
     }
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-black">
-      <div className="w-full max-w-md p-6 bg-white rounded-2xl shadow-lg">
-        <h2 className="text-2xl font-bold text-center mb-6">Welcome Back</h2>
+    <div className="h-screen bg-gray-950 flex items-center justify-center px-4 overflow-hidden">
+      <div className="w-full max-w-md p-5 sm:p-6 bg-gray-900 rounded-2xl shadow-2xl border border-yellow-600">
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Logo */}
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-bold text-yellow-500">WorkBoard</h1>
+          <p className="text-gray-400 text-sm mt-1">Welcome back</p>
+        </div>
 
+        <form onSubmit={handleSubmit} className="space-y-3">
+
+          {/* Email */}
           <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              Email Address
+            </label>
             <input
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               type="email"
-              placeholder="Enter your email"
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              placeholder="john@example.com"
+              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:border-yellow-500 placeholder-gray-500 text-sm"
             />
           </div>
 
-          <div className="relative">
-            <label className="block text-sm font-medium mb-1">Password</label>
-            <input
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              type={showPassword ? 'text' : 'password'}
-              placeholder="Enter your password"
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-            <span
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-9 cursor-pointer text-gray-500"
-            >
-              {showPassword ? '🙈' : '👁'}
-            </span>
+          {/* Password */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              Password
+            </label>
+            <div className="relative">
+              <input
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Enter your password"
+                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:border-yellow-500 placeholder-gray-500 text-sm"
+              />
+              <span
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-2 cursor-pointer text-gray-400"
+              >
+                {showPassword ? '🙈' : '👁'}
+              </span>
+            </div>
           </div>
 
+          {/* Error */}
           {error && (
-            <p className="text-red-500 text-sm">{error}</p>
+            <div className="bg-red-900 border border-red-700 text-red-300 px-4 py-2 rounded-lg text-sm">
+              {error}
+            </div>
           )}
 
+          {/* Submit */}
           <button
             type="submit"
-            className="w-full py-2 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition"
+            disabled={loading}
+            className="w-full py-2.5 bg-yellow-500 hover:bg-yellow-400 disabled:bg-yellow-800 disabled:cursor-not-allowed text-gray-900 font-bold rounded-lg transition text-sm"
           >
-            Login
+            {loading ? 'Signing in...' : 'Login'}
           </button>
 
-          <Link
-            href="/register"
-            className="block text-center text-green-600 mt-2 text-sm"
-          >
-            Don't have an account? Register
-          </Link>
+          {/* Divider */}
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px bg-gray-700" />
+            <span className="text-gray-500 text-xs">or</span>
+            <div className="flex-1 h-px bg-gray-700" />
+          </div>
+
+          {/* Register Link */}
+          <p className="text-center text-gray-400 text-sm">
+            Don't have an account?{" "}
+            <Link href="/register" className="text-yellow-500 hover:text-yellow-400 font-medium">
+              Create one
+            </Link>
+          </p>
 
         </form>
       </div>
