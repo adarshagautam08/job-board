@@ -12,6 +12,10 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
+  const SearchParams=useSearchParams()
+  const callbackUrl=SearchParams?.get('callbackUrl')||'/dashboard'
+//   const searchParamsData = useSearchParams()
+// const callbackUrl = searchParamsData?.get('callbackUrl') || '/dashboard'
 
   
 
@@ -25,12 +29,12 @@ export default function LoginPage() {
       password,
       redirect: false
     })
-
+    
     if (res?.error) {
       setError('Invalid email or password')
       setLoading(false)
     } else {
-      router.push('/dashboard')
+      router.push(callbackUrl)
     }
   }
 

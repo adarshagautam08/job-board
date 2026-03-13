@@ -3,6 +3,7 @@ import Filter from '../component/Filter'
 
 export default async function Jobs() {
   const jobs = await prisma.job.findMany()
+ 
   
   return (
     <div className="bg-[#1a1a1a] min-h-screen  text-white">
@@ -12,7 +13,7 @@ export default async function Jobs() {
         <p className="text-[22px] font-bold text-yellow-500">WorkBoard</p>
         <div className="flex gap-6">
           <a
-            href="/login"
+            href="/login?callbackUrl=/dashboard/post-job"
             className="bg-[#D4A853] hover:bg-yellow-600 text-black px-6 py-2 rounded-md font-medium"
           >
             Post a Job
@@ -61,7 +62,9 @@ export default async function Jobs() {
       </div>
     {/*job listing section  */}
 
-    <Filter/>
+    
+    <Filter jobs={jobs}  />
+    
 
 </div>
    
