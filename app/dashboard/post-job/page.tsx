@@ -1,10 +1,9 @@
 'use client'
 
-import { useState,useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from "next/navigation"
 
 export default function PostJob() {
- 
   const router = useRouter()
   const [form, setForm] = useState({
     title: '',
@@ -20,24 +19,21 @@ export default function PostJob() {
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
 
-   useEffect(() => {
-  if (error) {
-    const timer = setTimeout(() => {
-      setError('')
-    }, 1000)
-    return () => clearTimeout(timer)
-  }
-}, [error])
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(''), 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [error])
 
-useEffect(() => {
-  if (success) {
-    const timer = setTimeout(() => {
-      setSuccess(false)
-    }, 2000)
-    return () => clearTimeout(timer)
-  }
-}, [success])
-
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        router.push('/dashboard')
+      }, 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [success])
 
   const postJob = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -57,12 +53,8 @@ useEffect(() => {
       setLoading(false)
     } else {
       setSuccess(true)
-      setTimeout(() => {
-        router.push('/dashboard')
-      }, 2000)
     }
   }
-  
 
   return (
     <div className="bg-[#1a1a1a] min-h-screen text-white">
@@ -105,52 +97,32 @@ useEffect(() => {
         <p className="text-gray-400 mb-8">Fill in the details to post a new job listing</p>
 
         <form onSubmit={postJob} className="space-y-5">
-
-          {/* Title */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">Job Title</label>
-            <input
-              type="text"
-              placeholder="e.g. Frontend Developer"
-              value={form.title}
+            <input type="text" placeholder="e.g. Frontend Developer" value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:border-yellow-500 placeholder-gray-500 text-sm"
-            />
+              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:border-yellow-500 placeholder-gray-500 text-sm" />
           </div>
 
-          {/* Company */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">Company Name</label>
-            <input
-              type="text"
-              placeholder="e.g. Tech Nepal"
-              value={form.company}
+            <input type="text" placeholder="e.g. Tech Nepal" value={form.company}
               onChange={(e) => setForm({ ...form, company: e.target.value })}
-              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:border-yellow-500 placeholder-gray-500 text-sm"
-            />
+              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:border-yellow-500 placeholder-gray-500 text-sm" />
           </div>
 
-          {/* Location */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">Location</label>
-            <input
-              type="text"
-              placeholder="e.g. Kathmandu / Remote"
-              value={form.location}
+            <input type="text" placeholder="e.g. Kathmandu / Remote" value={form.location}
               onChange={(e) => setForm({ ...form, location: e.target.value })}
-              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:border-yellow-500 placeholder-gray-500 text-sm"
-            />
+              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:border-yellow-500 placeholder-gray-500 text-sm" />
           </div>
 
-          {/* Type and Category */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">Job Type</label>
-              <select
-                value={form.type}
-                onChange={(e) => setForm({ ...form, type: e.target.value })}
-                className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:border-yellow-500 text-sm"
-              >
+              <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}
+                className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:border-yellow-500 text-sm">
                 <option value="">Select type</option>
                 <option value="Full Time">Full Time</option>
                 <option value="Part Time">Part Time</option>
@@ -159,14 +131,10 @@ useEffect(() => {
                 <option value="Contract">Contract</option>
               </select>
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">Category</label>
-              <select
-                value={form.category}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
-                className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:border-yellow-500 text-sm"
-              >
+              <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}
+                className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:border-yellow-500 text-sm">
                 <option value="">Select category</option>
                 <option value="Technology">Technology</option>
                 <option value="Design">Design</option>
@@ -177,51 +145,32 @@ useEffect(() => {
             </div>
           </div>
 
-          {/* Salary */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">Min Salary</label>
-              <input
-                type="number"
-                placeholder="e.g. 50000"
-                value={form.salaryMin}
+              <input type="number" placeholder="e.g. 50000" value={form.salaryMin}
                 onChange={(e) => setForm({ ...form, salaryMin: e.target.value })}
-                className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:border-yellow-500 placeholder-gray-500 text-sm"
-              />
+                className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:border-yellow-500 placeholder-gray-500 text-sm" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">Max Salary</label>
-              <input
-                type="number"
-                placeholder="e.g. 80000"
-                value={form.salaryMax}
+              <input type="number" placeholder="e.g. 80000" value={form.salaryMax}
                 onChange={(e) => setForm({ ...form, salaryMax: e.target.value })}
-                className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:border-yellow-500 placeholder-gray-500 text-sm"
-              />
+                className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:border-yellow-500 placeholder-gray-500 text-sm" />
             </div>
           </div>
 
-          {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">Job Description</label>
-            <textarea
-              rows={5}
-              placeholder="Describe the job role, requirements, and responsibilities..."
-              value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:border-yellow-500 placeholder-gray-500 text-sm resize-none"
-            />
+            <textarea rows={5} placeholder="Describe the job role, requirements, and responsibilities..."
+              value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
+              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:border-yellow-500 placeholder-gray-500 text-sm resize-none" />
           </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-yellow-500 hover:bg-yellow-400 disabled:bg-yellow-800 disabled:cursor-not-allowed text-black font-bold rounded-lg transition text-sm"
-          >
+          <button type="submit" disabled={loading}
+            className="w-full py-3 bg-yellow-500 hover:bg-yellow-400 disabled:bg-yellow-800 disabled:cursor-not-allowed text-black font-bold rounded-lg transition text-sm">
             {loading ? 'Posting...' : 'Post Job'}
           </button>
-
         </form>
       </div>
     </div>
