@@ -1,8 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState,useEffect } from 'react'
+import { useRouter } from "next/navigation"
 
 export default function PostJob() {
+ 
+  const router = useRouter()
   const [form, setForm] = useState({
     title: '',
     company: '',
@@ -13,10 +16,53 @@ export default function PostJob() {
     category: '',
     description: '',
   })
-  const postJob=()=>
-  {
-    
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
+  const [loading, setLoading] = useState(false)
+
+   useEffect(() => {
+  if (error) {
+    const timer = setTimeout(() => {
+      setError('')
+    }, 1000)
+    return () => clearTimeout(timer)
   }
+}, [error])
+
+useEffect(() => {
+  if (success) {
+    const timer = setTimeout(() => {
+      setSuccess(false)
+    }, 2000)
+    return () => clearTimeout(timer)
+  }
+}, [success])
+
+
+  const postJob = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+
+    const response = await fetch("/api/job-post", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form)
+    })
+
+    const data = await response.json()
+
+    if (data.error) {
+      setError(data.error)
+      setLoading(false)
+    } else {
+      setSuccess(true)
+      setTimeout(() => {
+        router.push('/dashboard')
+      }, 2000)
+    }
+  }
+  
 
   return (
     <div className="bg-[#1a1a1a] min-h-screen text-white">
@@ -30,6 +76,28 @@ export default function PostJob() {
           ← Back to Dashboard
         </a>
       </div>
+
+      {/* Success Alert */}
+      {success && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-green-900 border border-green-500 text-green-300 px-8 py-4 rounded-xl shadow-2xl flex items-center gap-3">
+          <span className="text-2xl">✅</span>
+          <div>
+            <p className="font-bold text-white">Job Posted Successfully!</p>
+            <p className="text-sm text-green-400">Redirecting to dashboard...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Error Alert */}
+      {error && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-red-900 border border-red-500 text-red-300 px-8 py-4 rounded-xl shadow-2xl flex items-center gap-3">
+          <span className="text-2xl">❌</span>
+          <div>
+            <p className="font-bold text-white">Something went wrong!</p>
+            <p className="text-sm text-red-400">{error}</p>
+          </div>
+        </div>
+      )}
 
       {/* Form */}
       <div className="max-w-3xl mx-auto px-6 py-12">
@@ -148,9 +216,10 @@ export default function PostJob() {
           {/* Submit */}
           <button
             type="submit"
-            className="w-full py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-lg transition text-sm"
+            disabled={loading}
+            className="w-full py-3 bg-yellow-500 hover:bg-yellow-400 disabled:bg-yellow-800 disabled:cursor-not-allowed text-black font-bold rounded-lg transition text-sm"
           >
-            Post Job
+            {loading ? 'Posting...' : 'Post Job'}
           </button>
 
         </form>

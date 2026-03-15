@@ -34,7 +34,7 @@ model Job {
   userId       String
   user         User          @relation(fields: [userId], references: [id])
   applications Application[]
-}
+} 
 
 model Application {
   id          String   @id @default(cuid())
