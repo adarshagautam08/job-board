@@ -1,8 +1,7 @@
 "use client"
 import{useSession} from 'next-auth/react'
-
-
-
+import EmployerDashboard from '../component/EmployerDashboard'
+import SeekerDashboard from '../component/SeekerDashboard'
 export default function Dashboard() {
     const {data:session,status}=useSession()
 
@@ -12,26 +11,19 @@ export default function Dashboard() {
             <p>....loading</p>
         )
     }
-
     if(session?.user?.role==='EMPLOYER')
     {
         return(
             <>
-        <h1>hello employer</h1>
-         <a href='/dashboard/post-job' >Post a job</a>
+        <EmployerDashboard session={session} />
          </>
         )
     }
     if(session?.user?.role==='SEEKER')
     {
         return(
-            <h1>hello seeker </h1>
+            <SeekerDashboard/>
         )
     }
-  return (
-    <div>
-      <h1>Dashboard</h1>
-     
-    </div>
-  )
+  
 }
