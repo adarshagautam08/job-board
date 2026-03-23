@@ -1,4 +1,5 @@
 'use client'
+
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -111,7 +112,7 @@ export default function LoginPage() {
 
           {/* Register Link */}
           <p className="text-center text-gray-400 text-sm">
-            Don't have an account?{" "}
+           ${ `Don't have an account?`}
             <Link href="/register" className="text-yellow-500 hover:text-yellow-400 font-medium">
               Create one
             </Link>
