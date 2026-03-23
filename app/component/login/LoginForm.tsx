@@ -1,20 +1,25 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
 
 export default function LoginForm() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const callbackUrl = searchParams?.get('callbackUrl') || '/dashboard'
-
+  const [callbackUrl, setCallbackUrl] = useState('/dashboard') // default
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  // Only runs on client
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const cb = params.get('callbackUrl')
+    if (cb) setCallbackUrl(cb)
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,7 +37,6 @@ export default function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
-      {/* Email */}
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-1">Email Address</label>
         <input
@@ -44,7 +48,6 @@ export default function LoginForm() {
         />
       </div>
 
-      {/* Password */}
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-1">Password</label>
         <div className="relative">
@@ -64,14 +67,12 @@ export default function LoginForm() {
         </div>
       </div>
 
-      {/* Error */}
       {error && (
         <div className="bg-red-900 border border-red-700 text-red-300 px-4 py-2 rounded-lg text-sm">
           {error}
         </div>
       )}
 
-      {/* Submit */}
       <button
         type="submit"
         disabled={loading}
@@ -80,14 +81,12 @@ export default function LoginForm() {
         {loading ? 'Signing in...' : 'Login'}
       </button>
 
-      {/* Divider */}
       <div className="flex items-center gap-3">
         <div className="flex-1 h-px bg-gray-700" />
         <span className="text-gray-500 text-xs">or</span>
         <div className="flex-1 h-px bg-gray-700" />
       </div>
 
-      {/* Register Link */}
       <p className="text-center text-gray-400 text-sm">
         Don&apos;t have an account?{' '}
         <Link href="/register" className="text-yellow-500 hover:text-yellow-400 font-medium">
