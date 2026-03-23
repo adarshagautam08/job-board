@@ -29,8 +29,13 @@ export default function LoginForm() {
     const res = await signIn('credentials', { email, password, redirect: false })
     if (res?.error) {
       setError('Invalid email or password')
+      console.log("Error came ",res?.error);
+      
       setLoading(false)
     } else {
+
+        console.log(res);
+        
       router.push(callbackUrl)
     }
   }
