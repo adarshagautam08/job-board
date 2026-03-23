@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getToken } from "next-auth/jwt"
 import { prisma } from "@/lib/prisma"
+import nodemailer from "nodemailer"
 
 export async function PATCH(
   request: NextRequest,
@@ -21,6 +22,7 @@ export async function PATCH(
 
     // 2️⃣ Get status from body
     const { status } = await request.json()
+    console.log(status)
 
     if (!status) {
       return NextResponse.json(
@@ -31,13 +33,17 @@ export async function PATCH(
 
     // 3️⃣ Check if application belongs to this employer
     const existingApplication = await prisma.application.findFirst({
-      where: {
-        id: params.id,
-        job: {
-          userId: employerId as string,
-        },
-      },
-    })
+  where: {
+    id: params.id,
+    job: {
+      userId: employerId as string,
+    },
+  },
+  include: {
+    user: true,
+    job: true,
+  },
+})
 
     if (!existingApplication) {
       return NextResponse.json(
@@ -55,6 +61,30 @@ export async function PATCH(
         status,
       },
     })
+
+    if(status==="ACCEPTED")
+    {
+      try{
+        const transpoter=nodemailer.createTransport({
+          host:process.env.SMTP_HOST,
+          port:Number(process.env.SMTP_PORT),
+          auth:{
+            user:process.env.SMTP_USER,
+            pass:process.env.SMTP_PASS
+          },
+        })
+        await transpoter.sendMail({
+         from: '"Job Board" <gautamadarsha@gmail.com>',
+          to: existingApplication.user.email, // applicant email
+          subject: "Congratulations! Your application was accepted",
+          text: `Hi ${existingApplication.user.name},\n\nYour application for "${existingApplication.job.title}" has been accepted!`,
+        })
+      }
+      catch(emailError)
+      {
+         console.error("Failed to send acceptance email:", emailError)
+      }
+    }
 
     // 5️⃣ Return updated data
     return NextResponse.json(updatedApplication)

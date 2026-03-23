@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react"
+import SpinLoader from "../SpinLoader"
 
 export default function Applicants() {
   const [applicants, setApplicants] = useState<any[]>([])
@@ -16,7 +17,9 @@ export default function Applicants() {
   }, [])
 
   if (loading) {
-    return <p className="text-gray-400">Loading applications...</p>
+    return <div className="flex justify-center items-center h-full">
+                <SpinLoader /> {/* loader while switching */}
+              </div>
   }
 
   const getStatusColor = (status: string) => {
@@ -25,6 +28,7 @@ export default function Applicants() {
       case 'REVIEWING':   return 'bg-blue-500 text-white'
       case 'SHORTLISTED': return 'bg-green-500 text-white'
       case 'REJECTED':    return 'bg-red-500 text-white'
+      case 'ACCEPTED':    return 'bg-yellow-500 text-white'
       default:            return 'bg-gray-500 text-white'
     }
   }
@@ -33,8 +37,9 @@ export default function Applicants() {
   await fetch(`/api/applicants/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' }, // ✅ fixed
-    body: JSON.stringify({ status })
+    body: JSON.stringify({ status})
   })
+
 
   setApplicants(applicants.map((app: any) =>
     app.id === id ? { ...app, status } : app
@@ -120,6 +125,15 @@ export default function Applicants() {
                 >
                   Reject
                 </button>
+
+                <div>
+                  <button
+                  onClick={() => updateStatus(applicant.id, 'ACCEPTED')}
+                  className="bg-yellow-300 hover:bg-yellow-500 text-black px-3 py-1 rounded-lg text-xs transition"
+                >
+                  Accept
+                </button>
+                </div>
               </div>
 
               {/* Applied Date */}

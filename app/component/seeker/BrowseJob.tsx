@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import SpinLoader from "../SpinLoader"
 
 export default function BrowseJobs() {
   const [jobs, setJobs] = useState<any[]>([])
@@ -20,7 +21,9 @@ export default function BrowseJobs() {
   }, [])
 
   if (loading) {
-    return <p className="text-gray-400">Loading jobs...</p>
+    return<div className="flex justify-center items-center h-full">
+                <SpinLoader  /> {/* loader while switching */}
+              </div>
   }
 
   const filteredJobs = selected === 'All'

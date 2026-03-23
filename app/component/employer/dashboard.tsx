@@ -2,11 +2,13 @@
 
 import { Session } from 'next-auth'
 import { useEffect, useState } from 'react'
+import SpinLoader from '../SpinLoader'
 
 export default function EmployerOverview({ session }: { session: Session }) {
   const [jobs, setJobs] = useState<any[]>([])
   const [applicants, setApplicants] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+
 
   useEffect(() => {
     Promise.all([
@@ -20,7 +22,9 @@ export default function EmployerOverview({ session }: { session: Session }) {
   }, [])
 
   if (loading) {
-    return <p className="text-gray-400 text-center mt-20">Loading...</p>
+    return <div className="flex justify-center items-center h-full">
+                <SpinLoader  /> {/* loader while switching */}
+              </div>
   }
 
   return (

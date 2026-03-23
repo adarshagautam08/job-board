@@ -1,10 +1,14 @@
 'use client'
 
 import { useEffect, useState } from "react"
+import SpinLoader from "../SpinLoader"
 
 export default function MyApplications() {
   const [applications, setApplications] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  
+
+  console.log("applications",applications)
 
   const fetchApplications = () => {
     setLoading(true)
@@ -21,7 +25,9 @@ export default function MyApplications() {
   }, [])
 
   if (loading) {
-    return <p className="text-gray-400">Loading applications...</p>
+    return <div className="flex justify-center items-center h-full">
+                <SpinLoader  /> {/* loader while switching */}
+              </div>
   }
 
   const getStatusColor = (status: string) => {
@@ -30,6 +36,7 @@ export default function MyApplications() {
       case 'REVIEWING':   return 'bg-blue-500 text-white'
       case 'SHORTLISTED': return 'bg-green-500 text-white'
       case 'REJECTED':    return 'bg-red-500 text-white'
+      case 'ACCEPTED':    return 'bg-yellow-500 text-white  '
       default:            return 'bg-gray-500 text-white'
     }
   }
@@ -40,7 +47,8 @@ export default function MyApplications() {
       case 'REVIEWING':   return 'Employer is reviewing your application'
       case 'SHORTLISTED': return 'Congratulations! You have been shortlisted'
       case 'REJECTED':    return 'Unfortunately your application was not selected'
-      default:            return ''
+      case 'ACCEPTED':     return 'You have been selected'
+      default:            return 'bg-gray-500 text-white'
     }
   }
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from "react"
+import SpinLoader from "../SpinLoader"
 
 export default function MyJobs() {
   const [jobs, setJobs] = useState<any[]>([])
@@ -26,7 +27,9 @@ export default function MyJobs() {
   }, [])
 
   if (loading) {
-    return <p className="text-gray-400">Loading jobs...</p>
+    return <div className="flex justify-center items-center h-full">
+                <SpinLoader /> {/* loader while switching */}
+              </div>
   }
 
   const deleteJob = async (id: string) => {
