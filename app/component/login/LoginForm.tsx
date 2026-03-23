@@ -17,28 +17,40 @@ export default function LoginForm() {
   // Only runs on client
  
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    console.log("hello");
-    
-    e.preventDefault()
-    setLoading(true)
-    setError('')
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    const res = await signIn('credentials', { email, password, redirect: false })
-    console.log("hello1");
-    
+  setLoading(true);
+  setError(''); // clear previous error
+
+  try {
+    console.log("Attempting sign in...");
+
+    const res = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    });
+
+    console.log("signIn response:", res);
+
     if (res?.error) {
-      setError('Invalid email or password')
-      console.log("Error came ",res?.error);
-      
-      setLoading(false)
+      // Authentication failed
+      setError(res.error || 'Invalid email or password');
+      console.log("Sign-in failed:", res.error);
     } else {
-
-        console.log(res);
-        
-      router.push("/dashboard")
+      // Success
+      console.log("Sign-in successful", res);
+      router.push("/dashboard");
     }
+  } catch (err: any) {
+    // Network error, NextAuth crash, etc.
+    console.error("Unexpected error during signIn:", err);
+    setError('Something went wrong. Please try again.');
+  } finally {
+    setLoading(false);
   }
+};
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
