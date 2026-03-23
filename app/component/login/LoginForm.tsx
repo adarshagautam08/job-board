@@ -7,7 +7,7 @@ import { signIn } from 'next-auth/react'
 
 export default function LoginForm() {
   const router = useRouter()
-  const [callbackUrl, setCallbackUrl] = useState('/dashboard') // default
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -15,18 +15,18 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false)
 
   // Only runs on client
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const cb = params.get('callbackUrl')
-    if (cb) setCallbackUrl(cb)
-  }, [])
+ 
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log("hello");
+    
     e.preventDefault()
     setLoading(true)
     setError('')
 
     const res = await signIn('credentials', { email, password, redirect: false })
+    console.log("hello1");
+    
     if (res?.error) {
       setError('Invalid email or password')
       console.log("Error came ",res?.error);
@@ -36,7 +36,7 @@ export default function LoginForm() {
 
         console.log(res);
         
-      router.push(callbackUrl)
+      router.push("/dashboard")
     }
   }
 
