@@ -36,11 +36,13 @@ export async function POST(request:NextRequest)
             salaryMax:parseInt (body.salaryMax),
             userId:userId as string
         }
+        
     });
     return NextResponse.json(
         {message:'Job posted successfully'},
         {status:200}
     )
+    
 
 
 

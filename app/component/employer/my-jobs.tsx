@@ -2,21 +2,19 @@
 
 import { useState, useEffect } from "react"
 
-interface Job {
-  id: string
-  title: string
-  company: string
-  location: string
-  type: string
-  salaryMin: number
-  salaryMax: number
-}
-
 export default function MyJobs() {
-  const [jobs, setJobs] = useState<Job[]>([])
+  const [jobs, setJobs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [editingJobId, setEditingJobId] = useState<string | null>(null)
-  const [formData, setFormData] = useState<Partial<Job>>({})
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editForm, setEditForm] = useState({
+    title: '',
+    company: '',
+    location: '',
+    type: '',
+    salaryMin: '',
+    salaryMax: '',
+    description: ''
+  })
 
   useEffect(() => {
     fetch('/api/my-jobs')
@@ -32,45 +30,40 @@ export default function MyJobs() {
   }
 
   const deleteJob = async (id: string) => {
-    const res = await fetch(`/api/my-jobs/${id}`, { method: 'DELETE' })
-    if (res.ok) {
-      setJobs(jobs.filter(job => job.id !== id))
-    } else {
-      const data = await res.json()
-      console.error(data.error)
-    }
+    await fetch(`/api/my-jobs/${id}`, {
+      method: 'DELETE'
+    })
+    setJobs(jobs.filter((job: any) => job.id !== id))
   }
 
-  const startEditing = (job: Job) => {
-    setEditingJobId(job.id)
-    setFormData({ ...job })
+  const startEdit = (job: any) => {
+    setEditingId(job.id)
+    setEditForm({
+      title: job.title,
+      company: job.company,
+      location: job.location,
+      type: job.type,
+      salaryMin: job.salaryMin,
+      salaryMax: job.salaryMax,
+      description: job.description
+    })
   }
 
-  const cancelEditing = () => {
-    setEditingJobId(null)
-    setFormData({})
-  }
-
-  const saveJob = async () => {
-    if (!editingJobId) return
-    const res = await fetch(`/api/my-jobs/${editingJobId}`, {
+  const saveEdit = async (id: string) => {
+    const response = await fetch(`/api/my-jobs/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData)
+      body: JSON.stringify(editForm)
     })
-    if (res.ok) {
-      const updatedJob = await res.json()
-      setJobs(jobs.map(job => job.id === editingJobId ? updatedJob : job))
-      setEditingJobId(null)
-      setFormData({})
-    } else {
-      const data = await res.json()
-      console.error(data.error)
-    }
-  }
 
-  const handleChange = (field: keyof Job, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+    const data = await response.json()
+
+    if (data.error) {
+      alert(data.error)
+    } else {
+      setJobs(jobs.map((job: any) =>job.id === id ? { ...job, ...editForm } : job))
+      setEditingId(null)
+    }
   }
 
   return (
@@ -87,104 +80,129 @@ export default function MyJobs() {
         </div>
       ) : (
         <div className="space-y-4">
-          {jobs.map(job => (
+          {jobs.map((job: any) => (
             <div key={job.id} className="bg-[#2a2a2a] border border-gray-700 rounded-xl p-6 hover:border-yellow-500 transition">
-              {editingJobId === job.id ? (
-                // EDIT FORM
-                <div className="space-y-3">
-                  <input
-                    type="text"
-                    value={formData.title || ''}
-                    onChange={(e) => handleChange('title', e.target.value)}
-                    placeholder="Job Title"
-                    className="w-full p-2 rounded bg-[#1a1a1a] border border-gray-600 text-white"
-                  />
-                  <input
-                    type="text"
-                    value={formData.company || ''}
-                    onChange={(e) => handleChange('company', e.target.value)}
-                    placeholder="Company"
-                    className="w-full p-2 rounded bg-[#1a1a1a] border border-gray-600 text-white"
-                  />
-                  <input
-                    type="text"
-                    value={formData.location || ''}
-                    onChange={(e) => handleChange('location', e.target.value)}
-                    placeholder="Location"
-                    className="w-full p-2 rounded bg-[#1a1a1a] border border-gray-600 text-white"
-                  />
-                  <input
-                    type="text"
-                    value={formData.type || ''}
-                    onChange={(e) => handleChange('type', e.target.value)}
-                    placeholder="Job Type"
-                    className="w-full p-2 rounded bg-[#1a1a1a] border border-gray-600 text-white"
-                  />
-                  <div className="flex gap-2">
-                    <input
-                      type="number"
-                      value={formData.salaryMin || 0}
-                      onChange={(e) => handleChange('salaryMin', Number(e.target.value))}
-                      placeholder="Salary Min"
-                      className="w-1/2 p-2 rounded bg-[#1a1a1a] border border-gray-600 text-white"
-                    />
-                    <input
-                      type="number"
-                      value={formData.salaryMax || 0}
-                      onChange={(e) => handleChange('salaryMax', Number(e.target.value))}
-                      placeholder="Salary Max"
-                      className="w-1/2 p-2 rounded bg-[#1a1a1a] border border-gray-600 text-white"
+
+              {/* Job Info */}
+              <div className="flex justify-between items-start">
+                <div>
+                  <h2 className="text-lg font-bold text-white">{job.title}</h2>
+                  <p className="text-gray-400 text-sm mt-1">{job.company}</p>
+                  <p className="text-gray-500 text-sm">📍 {job.location}</p>
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  <span className="bg-yellow-500 text-black text-xs px-3 py-1 rounded-full font-medium">
+                    {job.type}
+                  </span>
+                  <span className="text-yellow-500 text-sm font-medium">
+                    ${job.salaryMin.toLocaleString()} - ${job.salaryMax.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+
+              {/* Edit Form */}
+              {editingId === job.id && (
+                <div className="mt-6 space-y-3 border-t border-gray-700 pt-6">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs text-gray-400 mb-1 block">Title</label>
+                      <input
+                        value={editForm.title}
+                        onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg text-sm focus:outline-none focus:border-yellow-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-400 mb-1 block">Company</label>
+                      <input
+                        value={editForm.company}
+                        onChange={(e) => setEditForm({ ...editForm, company: e.target.value })}
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg text-sm focus:outline-none focus:border-yellow-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-400 mb-1 block">Location</label>
+                      <input
+                        value={editForm.location}
+                        onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg text-sm focus:outline-none focus:border-yellow-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-400 mb-1 block">Type</label>
+                      <select
+                        value={editForm.type}
+                        onChange={(e) => setEditForm({ ...editForm, type: e.target.value })}
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg text-sm focus:outline-none focus:border-yellow-500"
+                      >
+                        <option value="Full Time">Full Time</option>
+                        <option value="Part Time">Part Time</option>
+                        <option value="Remote">Remote</option>
+                        <option value="Internship">Internship</option>
+                        <option value="Contract">Contract</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-400 mb-1 block">Min Salary</label>
+                      <input
+                        type="number"
+                        value={editForm.salaryMin}
+                        onChange={(e) => setEditForm({ ...editForm, salaryMin: e.target.value })}
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg text-sm focus:outline-none focus:border-yellow-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-400 mb-1 block">Max Salary</label>
+                      <input
+                        type="number"
+                        value={editForm.salaryMax}
+                        onChange={(e) => setEditForm({ ...editForm, salaryMax: e.target.value })}
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg text-sm focus:outline-none focus:border-yellow-500"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-400 mb-1 block">Description</label>
+                    <textarea
+                      rows={3}
+                      value={editForm.description}
+                      onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg text-sm focus:outline-none focus:border-yellow-500 resize-none"
                     />
                   </div>
-                  <div className="flex gap-3 mt-2">
+                  <div className="flex gap-3">
                     <button
-                      onClick={saveJob}
-                      className="bg-yellow-500 text-black px-4 py-1.5 rounded-lg text-sm"
+                      onClick={() => saveEdit(job.id)}
+                      className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-2 rounded-lg text-sm font-bold transition"
                     >
                       Save
                     </button>
                     <button
-                      onClick={cancelEditing}
-                      className="bg-gray-700 text-white px-4 py-1.5 rounded-lg text-sm"
+                      onClick={() => setEditingId(null)}
+                      className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-2 rounded-lg text-sm transition"
                     >
                       Cancel
                     </button>
                   </div>
                 </div>
-              ) : (
-                // DISPLAY MODE
-                <>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h2 className="text-lg font-bold text-white">{job.title}</h2>
-                      <p className="text-gray-400 text-sm mt-1">{job.company}</p>
-                      <p className="text-gray-500 text-sm">📍 {job.location}</p>
-                    </div>
-                    <div className="flex flex-col items-end gap-2">
-                      <span className="bg-yellow-500 text-black text-xs px-3 py-1 rounded-full font-medium">
-                        {job.type}
-                      </span>
-                      <span className="text-yellow-500 text-sm font-medium">
-                        ${job.salaryMin.toLocaleString()} - ${job.salaryMax.toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex gap-3 mt-4">
-                    <button
-                      onClick={() => startEditing(job)}
-                      className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-1.5 rounded-lg text-sm transition"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => deleteJob(job.id)}
-                      className="bg-red-900 hover:bg-red-800 text-red-300 px-4 py-1.5 rounded-lg text-sm transition"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </>
               )}
+
+              {/* Buttons */}
+              <div className="flex gap-3 mt-4">
+                <button
+                  onClick={() => startEdit(job)}
+                  className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-1.5 rounded-lg text-sm transition"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => deleteJob(job.id)}
+                  className="bg-red-900 hover:bg-red-800 text-red-300 px-4 py-1.5 rounded-lg text-sm transition"
+                >
+                  Delete
+                </button>
+              </div>
+
             </div>
           ))}
         </div>
@@ -192,3 +210,4 @@ export default function MyJobs() {
     </div>
   )
 }
+

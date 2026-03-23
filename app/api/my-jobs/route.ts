@@ -1,25 +1,30 @@
-import { NextRequest,NextResponse } from "next/server";
-import{prisma} from "@/lib/prisma"
-import { getToken } from "next-auth/jwt";
+import { NextRequest, NextResponse } from "next/server"
+import { prisma } from "@/lib/prisma"
+import { getToken } from "next-auth/jwt"
 
-export async function GET(request:NextRequest)
-{   
-    const token=await getToken(
-        {
-            req:request,
-            secret:process.env.NEXTAUTH_SECRET
-        }
-    )
-    if(!token)
-    {
-       return NextResponse.json({error:'Unauthorizes'},{status:401})
-    }
-    
-    const userId=token.sub
-    const job=await prisma.job.findMany(
-        {
-            where:{userId:userId as string }
-        }
-    )
-    return NextResponse.json(job)
+export async function GET(request: NextRequest) {
+  // 1️⃣ Get logged-in employer's ID from the token
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET
+  })
+
+  if (!token) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  const employerId = token.sub
+
+  try {
+    // 2️⃣ Fetch all jobs posted by this employer, newest first
+    const jobs = await prisma.job.findMany({
+      where: { userId: employerId as string },  // your Job model's employer field
+      orderBy: { createdAt: "desc" }
+    })
+
+    return NextResponse.json(jobs)
+  } catch (error) {
+    console.error(error)
+    return NextResponse.json({ error: "Failed to fetch jobs" }, { status: 500 })
+  }
 }

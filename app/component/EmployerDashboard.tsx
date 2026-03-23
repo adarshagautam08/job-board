@@ -5,6 +5,7 @@ import { Session } from 'next-auth'
 import PostJob from '../dashboard/post-job/page'
 import Dashboard from './employer/dashboard'
 import MyJobs from './employer/my-jobs'
+import Applicant from './employer/applicant'
 
 export default function EmployerDashboard({ session }: { session: Session }) {
   const [activePage, setActivePage] = useState('dashboard')
@@ -74,14 +75,14 @@ export default function EmployerDashboard({ session }: { session: Session }) {
               </button>
 
               <button
-                onClick={() => setActivePage('applications')}
+                onClick={() => setActivePage('applicant')}
                 className={`w-full text-left px-4 py-2.5 rounded-lg text-sm transition ${
                   activePage === 'applications'
                     ? 'bg-yellow-500 text-black font-bold'
                     : 'text-gray-400 hover:bg-gray-800'
                 }`}
               >
-                📋 Applications
+                📋 Applicant
               </button>
 
             </div>
@@ -102,13 +103,8 @@ export default function EmployerDashboard({ session }: { session: Session }) {
               <MyJobs />
             )}
 
-            {activePage === 'applications' && (
-              <div>
-                <h1 className="text-2xl font-bold mb-2">Applications</h1>
-                <p className="text-gray-400">
-                  Applications list goes here
-                </p>
-              </div>
+            {activePage === 'applicant' && (
+              <Applicant/>
             )}
 
           </div>

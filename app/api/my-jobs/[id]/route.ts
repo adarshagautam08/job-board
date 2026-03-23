@@ -34,18 +34,19 @@ export async function PATCH(request:NextRequest,{params}:{params:{id:string}})
     {
         return NextResponse.json(
             {error:'Unauthorized'},
-            {status:400}
+            {status:401}
         )
     }
+   
     const body=await request.json()
+    const { title, description, company, location, type, salaryMin, salaryMax } = body
 
-    const updatedJob=await prisma.job.update({
+    const updateJob=await prisma.job.update({
         where:{id:params.id},
-        data:{
-            title:body.title,
-            description:body.description
-        }
+        data:{title,description,company,location,type,salaryMin:parseInt(salaryMin),salaryMax:parseInt(salaryMax)}
     })
-    return NextResponse.json(updatedJob)
-    
+    return NextResponse.json(
+        {message:'the data is updated '}
+    )
+
 }

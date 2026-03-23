@@ -1,10 +1,12 @@
 import Apply from '@/app/component/Apply'
+import BackBtn from '@/app/component/BackBtn'
 import { prisma } from '@/lib/prisma'
 
 export default async function JobDetails({ params }: { params: { id: string } }) {
   const job = await prisma.job.findUnique({
     where: { id: params.id }
   })
+
 
   if (!job) {
     return (
@@ -13,6 +15,7 @@ export default async function JobDetails({ params }: { params: { id: string } })
       </div>
     )
   }
+ 
 
   return (
     <div className="bg-[#1a1a1a] min-h-screen text-white">
@@ -22,12 +25,7 @@ export default async function JobDetails({ params }: { params: { id: string } })
       <div className="max-w-4xl mx-auto px-6 py-12">
 
         {/* Back Button */}
-        <a
-          href="/jobs"
-          className="text-gray-400 hover:text-yellow-500 text-sm mb-8 inline-block transition"
-        >
-          ← Back to Jobs
-        </a>
+        <BackBtn/>
 
         {/* Job Header */}
         <div className="bg-[#2a2a2a] border border-gray-700 rounded-2xl p-8 mb-6">

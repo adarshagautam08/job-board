@@ -1,7 +1,5 @@
 'use client'
-
 import { useState } from "react"
-
 export default function Filter({ jobs }: { jobs: any[] }) {
   const filters = ['All', 'Full Time', 'Remote', 'Internship', 'Part Time']
   const [jobType, setJobType] = useState("All")

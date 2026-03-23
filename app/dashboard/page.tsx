@@ -22,7 +22,7 @@ export default function Dashboard() {
     if(session?.user?.role==='SEEKER')
     {
         return(
-            <SeekerDashboard/>
+            <SeekerDashboard session={session}/>
         )
     }
   
