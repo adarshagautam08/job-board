@@ -15,6 +15,7 @@ model User {
   password     String
   role         Role          @default(SEEKER)
   createdAt    DateTime      @default(now())
+  isVerified   Boolean       @default(false)
   applications Application[]
   jobs         Job[]
 }
@@ -46,6 +47,14 @@ model Application {
   coverLetter String
   job         Job      @relation(fields: [jobId], references: [id])
   user        User     @relation(fields: [seekerId], references: [id])
+}
+
+model OTP {
+  id        String   @id @default(cuid())
+  email     String
+  otp       String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
 
 enum Role {

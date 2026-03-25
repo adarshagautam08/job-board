@@ -6,8 +6,10 @@ import PostJob from "../dashboard/post-job/page";
 import Dashboard from "./employer/dashboard";
 import MyJobs from "./employer/my-jobs";
 import Applicant from "./employer/applicant";
+import Settings from "./seeker/Setting";
 // import loader
 import SpinLoader from "./SpinLoader";
+
 
 export default function EmployerDashboard({ session }: { session: Session }) {
   const [activePage, setActivePage] = useState("dashboard");
@@ -87,6 +89,17 @@ export default function EmployerDashboard({ session }: { session: Session }) {
               >
                 📋 Applicant
               </button>
+
+              <button
+                onClick={() => setActivePage('Setting')}
+                className={`w-full text-left px-4 py-2.5 rounded-lg text-sm transition ${
+                  activePage === 'Setting'
+                    ? 'bg-yellow-500 text-black font-bold'
+                    : 'text-gray-400 hover:bg-gray-800'
+                }`}
+              >
+              ⚙️ Setting
+              </button>
             </div>
           </div>
 
@@ -94,7 +107,7 @@ export default function EmployerDashboard({ session }: { session: Session }) {
           <div className="flex-1 p-8 h-[calc(100vh-100px)] overflow-y-auto">
             {loading ? (
               <div className="flex justify-center items-center h-full">
-                <SpinLoader size={2} /> {/* loader while switching */}
+                <SpinLoader  /> {/* loader while switching */}
               </div>
             ) : (
               <>
@@ -102,6 +115,8 @@ export default function EmployerDashboard({ session }: { session: Session }) {
                 {activePage === "post-job" && <PostJob />}
                 {activePage === "my-jobs" && <MyJobs />}
                 {activePage === "applicant" && <Applicant />}
+                {activePage === "Setting" && <Settings/>}
+                
               </>
             )}
           </div>

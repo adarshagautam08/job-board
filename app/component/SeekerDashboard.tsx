@@ -4,10 +4,10 @@ import { Session } from 'next-auth'
 import SeekerDashboard from './seeker/SeekerDashboard'
 import MyApplications from './seeker/MyApplications'
 import BrowseJob from './seeker/BrowseJob'
+import Setting from './seeker/Setting'
 
 export default function EmployerDashboard({ session }: { session: Session }) {
   const [activePage, setActivePage] = useState('dashboard')
-
   return (
     <div className="bg-[#1a1a1a] min-h-screen text-white">
 
@@ -72,13 +72,25 @@ export default function EmployerDashboard({ session }: { session: Session }) {
                 💼 BrowseJob
               </button>
 
+              
+              <button
+                onClick={() => setActivePage('Setting')}
+                className={`w-full text-left px-4 py-2.5 rounded-lg text-sm transition ${
+                  activePage === 'Setting'
+                    ? 'bg-yellow-500 text-black font-bold'
+                    : 'text-gray-400 hover:bg-gray-800'
+                }`}
+              >
+               ⚙️ Setting
+              </button>
+
              
 
             </div>
           </div>
 
           {/* Main Content (Scrollable) */}
-          <div className="flex-1 p-8 h-[calc(100vh-100px)] overflow-y-auto">
+          <div className={`flex-1 p-8 h-[calc(100vh-100px)] ${activePage === 'Setting' ? 'overflow-hidden' : 'overflow-y-auto'}`}>
 
             {activePage === 'dashboard' && (
               <SeekerDashboard session={session} />
@@ -92,13 +104,9 @@ export default function EmployerDashboard({ session }: { session: Session }) {
               <BrowseJob/>
             )}
 
-            {activePage === 'applications' && (
-              <div>
-                <h1 className="text-2xl font-bold mb-2">Applications</h1>
-                <p className="text-gray-400">
-                  Applications list goes here
-                </p>
-              </div>
+
+            {activePage === 'Setting' && (
+              <Setting/>
             )}
 
           </div>

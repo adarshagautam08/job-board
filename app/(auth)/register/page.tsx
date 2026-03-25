@@ -30,7 +30,7 @@ export default function Register() {
       setError(data.error)
       setLoading(false)
     } else {
-      router.push('/login')
+      router.push(`/verifyotp?email=${encodeURIComponent(email)}`)
     }
   }
 
