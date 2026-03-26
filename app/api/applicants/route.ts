@@ -24,7 +24,8 @@ export async function GET(request:NextRequest)
                 }
             },
             include:{
-                job:true
+                job:true,
+                 user: true
             }
         }
     )

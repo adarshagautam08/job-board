@@ -18,6 +18,9 @@ model User {
   isVerified   Boolean       @default(false)
   applications Application[]
   jobs         Job[]
+  employerConversations  Conversation[] @relation("EmployerConversations")
+  seekerConversations    Conversation[] @relation("SeekerConversations")
+  messages               Message[]
 }
 
 model Job {
@@ -35,6 +38,7 @@ model Job {
   userId       String
   applications Application[]
   user         User          @relation(fields: [userId], references: [id])
+  conversations  Conversation[]
 }
 
 model Application {
@@ -55,6 +59,28 @@ model OTP {
   otp       String
   expiresAt DateTime
   createdAt DateTime @default(now())
+}
+model Conversation {
+  id         String    @id @default(cuid())
+  jobId      String
+  employerId String
+  seekerId   String
+  createdAt  DateTime  @default(now())
+  job      Job     @relation(fields: [jobId], references: [id])
+  employer User    @relation("EmployerConversations", fields: [employerId], references: [id])
+  seeker   User    @relation("SeekerConversations", fields: [seekerId], references: [id])
+  messages Message[]
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  senderId       String
+  content        String
+  createdAt      DateTime     @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+  sender       User         @relation(fields: [senderId], references: [id])
 }
 
 enum Role {

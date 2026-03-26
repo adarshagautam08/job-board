@@ -9,6 +9,7 @@ import Applicant from "./employer/applicant";
 import Settings from "./seeker/Setting";
 // import loader
 import SpinLoader from "./SpinLoader";
+import ChatInbox from "@/app/chat/page"
 
 
 export default function EmployerDashboard({ session }: { session: Session }) {
@@ -90,6 +91,18 @@ export default function EmployerDashboard({ session }: { session: Session }) {
                 📋 Applicant
               </button>
 
+              
+              <button
+                onClick={() => setActivePage('Chats')}
+                className={`w-full text-left px-4 py-2.5 rounded-lg text-sm transition ${
+                  activePage === 'Chats'
+                    ? 'bg-yellow-500 text-black font-bold'
+                    : 'text-gray-400 hover:bg-gray-800'
+                }`}
+              >
+               💬 Chats
+              </button>
+
               <button
                 onClick={() => setActivePage('Setting')}
                 className={`w-full text-left px-4 py-2.5 rounded-lg text-sm transition ${
@@ -116,6 +129,9 @@ export default function EmployerDashboard({ session }: { session: Session }) {
                 {activePage === "my-jobs" && <MyJobs />}
                 {activePage === "applicant" && <Applicant />}
                 {activePage === "Setting" && <Settings/>}
+                {activePage === 'Chats' && (
+                           <ChatInbox />
+                             )}
                 
               </>
             )}

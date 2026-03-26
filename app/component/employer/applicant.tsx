@@ -33,17 +33,33 @@ export default function Applicants() {
     }
   }
 
- const updateStatus = async (id: string, status: string) => {
+  // 1. updateStatus first
+const updateStatus = async (id: string, status: string) => {
   await fetch(`/api/applicants/${id}`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' }, // ✅ fixed
-    body: JSON.stringify({ status})
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status })
   })
-
 
   setApplicants(applicants.map((app: any) =>
     app.id === id ? { ...app, status } : app
   ))
+}
+
+// 2. handleAccept second (uses updateStatus so must come after)
+const handleAccept = async (applicant: any) => {
+  await updateStatus(applicant.id, 'ACCEPTED')
+  const res = await fetch('/api/conversations', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      jobId: applicant.job.id,
+      seekerId: applicant.user.id
+    })
+  })
+
+  const conversation = await res.json()
+  window.location.href = `/chat/${conversation.id}`
 }
 
   return (
@@ -127,12 +143,12 @@ export default function Applicants() {
                 </button>
 
                 <div>
-                  <button
-                  onClick={() => updateStatus(applicant.id, 'ACCEPTED')}
-                  className="bg-yellow-300 hover:bg-yellow-500 text-black px-3 py-1 rounded-lg text-xs transition"
-                >
-                  Accept
-                </button>
+                 <button
+  onClick={() => handleAccept(applicant)}
+  className="bg-yellow-300 hover:bg-yellow-500 text-black px-3 py-1 rounded-lg text-xs transition"
+>
+  Accept
+</button>
                 </div>
               </div>
 
