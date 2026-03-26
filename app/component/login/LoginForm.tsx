@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
@@ -14,49 +14,34 @@ export default function LoginForm() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  // Only runs on client
- 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
 
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+    try {
+      console.log("Attempting sign in...")
+      const res = await signIn('credentials', {
+        email,
+        password,
+        redirect: false, // manual redirect
+      })
+      console.log("signIn response:", res)
 
-  setLoading(true);
-  setError(''); // clear previous error
-
-  try {
-    console.log("Attempting sign in...");
-
-    const res = await signIn('credentials', {
-      email,
-      password,
-      redirect: false,
-    });
-
-    console.log("signIn response:", res);
-
-    if (res?.error) {
-      // Authentication failed
-      setError(res.error || 'Invalid email or password');
-      console.log("Sign-in failed:", res.error);
-
-    if (res?.ok) {
-  router.refresh(); // ✅ update session
-  router.push("/dashboard");
-}
-
-    } else {
-      // Success
-      console.log("Sign-in successful", res);
-      router.push("/dashboard");
+      if (res?.ok) {
+        // Successful login → redirect to dashboard
+        router.push('/dashboard')
+      } else {
+        // Login failed → show error
+        setError(res?.error || 'Invalid email or password')
+      }
+    } catch (err: any) {
+      console.error("Unexpected error during signIn:", err)
+      setError('Something went wrong. Please try again.')
+    } finally {
+      setLoading(false)
     }
-  } catch (err: any) {
-    // Network error, NextAuth crash, etc.
-    console.error("Unexpected error during signIn:", err);
-    setError('Something went wrong. Please try again.');
-  } finally {
-    setLoading(false);
   }
-};
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
