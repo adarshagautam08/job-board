@@ -38,6 +38,12 @@ export default function LoginForm() {
       // Authentication failed
       setError(res.error || 'Invalid email or password');
       console.log("Sign-in failed:", res.error);
+
+    if (res?.ok) {
+  router.refresh(); // ✅ update session
+  router.push("/dashboard");
+}
+
     } else {
       // Success
       console.log("Sign-in successful", res);
