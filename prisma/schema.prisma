@@ -53,7 +53,7 @@ model Application {
   user        User     @relation(fields: [seekerId], references: [id])
 }
 
-model OTP {
+model Otp {
   id        String   @id @default(cuid())
   email     String
   otp       String

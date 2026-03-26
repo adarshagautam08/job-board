@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       } else {
         // Unverified user exists → delete old entry so we can re-register
         await prisma.user.delete({ where: { email } });
-        await prisma.oTP.deleteMany({ where: { email } }); // remove old OTP
+        await prisma.otp.deleteMany({ where: { email } }); // remove old OTP
       }
     }
 
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + 10);
 
-    await prisma.oTP.create({ data: { email, otp, expiresAt } });
+    await prisma.otp.create({ data: { email, otp, expiresAt } });
 
     // Send OTP email
     const transporter = nodemailer.createTransport({

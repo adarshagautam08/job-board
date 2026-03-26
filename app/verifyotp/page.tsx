@@ -1,12 +1,12 @@
 'use client'
 
 import { useSearchParams, useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 
-export default function VerifyOTP() {
+function VerifyOTPContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const email = searchParams.get('email') // this gets "illumanati008@gmail.com"
+  const email = searchParams.get('email')
   const [otp, setOtp] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -28,7 +28,7 @@ export default function VerifyOTP() {
       setError(data.error)
       setLoading(false)
     } else {
-      router.push('/login') // OTP verified successfully
+      router.push('/login')
     }
   }
 
@@ -51,5 +51,13 @@ export default function VerifyOTP() {
       </button>
       {error && <p className="text-red-500">{error}</p>}
     </form>
+  )
+}
+
+export default function VerifyOTP() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <VerifyOTPContent />
+    </Suspense>
   )
 }

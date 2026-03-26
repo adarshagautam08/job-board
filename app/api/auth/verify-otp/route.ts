@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     const trimmedOtp = otp.trim();
 
     // 1️⃣ Find OTP
-    const record = await prisma.oTP.findFirst({
+    const record = await prisma.otp.findFirst({
       where: { email, otp: trimmedOtp},
       orderBy: { createdAt: "desc" },
     });
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     });
 
     // 3️⃣ Delete OTP
-    await prisma.oTP.deleteMany({ where: { email } });
+    await prisma.otp.deleteMany({ where: { email } });
 
     return NextResponse.json({ message: "Email verified successfully" });
   } catch (err) {
