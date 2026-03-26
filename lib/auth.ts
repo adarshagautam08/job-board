@@ -6,19 +6,22 @@ import bcrypt from "bcryptjs";
 import { NextAuthOptions } from "next-auth";
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma), // <-- important for EmailProvider
+  adapter: PrismaAdapter(prisma), // Required for EmailProvider
   providers: [
+    // Email login via Gmail SMTP
     EmailProvider({
       server: {
-        host: process.env.SMTP_HOST,
-        port: Number(process.env.SMTP_PORT),
+        host: process.env.SMTP_HOST,          // smtp.gmail.com
+        port: Number(process.env.SMTP_PORT),  // 587
         auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
+          user: process.env.SMTP_USER,        // your gmail
+          pass: process.env.SMTP_PASS,        // gmail app password
         },
       },
       from: process.env.SMTP_USER,
     }),
+
+    // Credentials login (email + password)
     CredentialsProvider({
       name: "credentials",
       credentials: {
@@ -26,41 +29,52 @@ export const authOptions: NextAuthOptions = {
         password: {},
       },
       async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Email and password required");
+        }
+
         const user = await prisma.user.findUnique({
-          where: { email: credentials?.email },
+          where: { email: credentials.email },
         });
+
         if (!user) throw new Error("No user found");
 
         const passwordMatch = await bcrypt.compare(
-          credentials?.password as string,
+          credentials.password,
           user.password
         );
+
         if (!passwordMatch) throw new Error("Wrong password");
 
         return user;
       },
     }),
   ],
+
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = user.role;
         token.id = user.id;
+        token.role = user.role;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.role = token.role;
         session.user.id = token.id as string;
+        session.user.role = token.role;
       }
       return session;
     },
   },
+
   pages: {
     signIn: "/login",
   },
+
   session: {
     strategy: "jwt",
   },
+
+  secret: process.env.NEXTAUTH_SECRET, // Required for JWT
 };
