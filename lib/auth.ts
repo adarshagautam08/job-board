@@ -1,51 +1,46 @@
-import { NextAuthOptions } from "next-auth";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { prisma } from "./prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
 import EmailProvider from "next-auth/providers/email";
-import { prisma } from './prisma';
-import bcrypt from 'bcryptjs';
+import bcrypt from "bcryptjs";
+import { NextAuthOptions } from "next-auth";
 
 export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma), // <-- important for EmailProvider
   providers: [
-    // Email login (Gmail SMTP)
     EmailProvider({
       server: {
         host: process.env.SMTP_HOST,
         port: Number(process.env.SMTP_PORT),
         auth: {
           user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS
-        }
+          pass: process.env.SMTP_PASS,
+        },
       },
-      from: process.env.SMTP_USER
+      from: process.env.SMTP_USER,
     }),
-
-    // Credentials login (email + password)
     CredentialsProvider({
-      name: 'credentials',
+      name: "credentials",
       credentials: {
         email: {},
-        password: {}
+        password: {},
       },
       async authorize(credentials) {
-        console.log('authorize called', credentials);
         const user = await prisma.user.findUnique({
-          where: { email: credentials?.email }
+          where: { email: credentials?.email },
         });
-
-        if (!user) throw new Error('No user found');
+        if (!user) throw new Error("No user found");
 
         const passwordMatch = await bcrypt.compare(
           credentials?.password as string,
           user.password
         );
-
-        if (!passwordMatch) throw new Error('Wrong password');
+        if (!passwordMatch) throw new Error("Wrong password");
 
         return user;
-      }
-    })
+      },
+    }),
   ],
-
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -60,14 +55,12 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string;
       }
       return session;
-    }
+    },
   },
-
   pages: {
-    signIn: '/login'
+    signIn: "/login",
   },
-
   session: {
-    strategy: 'jwt'
-  }
+    strategy: "jwt",
+  },
 };

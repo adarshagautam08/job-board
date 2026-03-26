@@ -21,6 +21,10 @@ model User {
   employerConversations  Conversation[] @relation("EmployerConversations")
   seekerConversations    Conversation[] @relation("SeekerConversations")
   messages               Message[]
+  
+  // Relations for NextAuth
+  accounts  Account[]
+  sessions  Session[]
 }
 
 model Job {
@@ -60,16 +64,17 @@ model Otp {
   expiresAt DateTime
   createdAt DateTime @default(now())
 }
+
 model Conversation {
   id         String    @id @default(cuid())
   jobId      String
   employerId String
   seekerId   String
   createdAt  DateTime  @default(now())
-  job      Job     @relation(fields: [jobId], references: [id])
-  employer User    @relation("EmployerConversations", fields: [employerId], references: [id])
-  seeker   User    @relation("SeekerConversations", fields: [seekerId], references: [id])
-  messages Message[]
+  job        Job       @relation(fields: [jobId], references: [id])
+  employer   User      @relation("EmployerConversations", fields: [employerId], references: [id])
+  seeker     User      @relation("SeekerConversations", fields: [seekerId], references: [id])
+  messages   Message[]
 }
 
 model Message {
@@ -94,4 +99,42 @@ enum Status {
   SHORTLISTED
   REJECTED
   ACCEPTED
+}
+
+
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
