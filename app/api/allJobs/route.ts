@@ -4,10 +4,17 @@ import { getToken } from "next-auth/jwt";
 
 export async function GET(request:NextRequest)
 {   
-  const token=await getToken({
-    req:request,
-    secret:process.env.NEXTAUTH_SECRET
-  })
+  // const token=await getToken({
+  //   req:request,
+  //   secret:process.env.NEXTAUTH_SECRET
+  // })
+   const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+    cookieName: process.env.NODE_ENV === "production"
+        ? "__Secure-next-auth.session-token"
+        : "next-auth.session-token"
+})
     try {
     const jobs = await prisma.job.findMany(
 

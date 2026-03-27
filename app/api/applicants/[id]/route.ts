@@ -9,10 +9,18 @@ export async function PATCH(
 ) {
   try {
     // 1️⃣ Get logged-in employer
-    const token = await getToken({
-      req: request,
-      secret: process.env.NEXTAUTH_SECRET,
-    })
+    // const token = await getToken({
+    //   req: request,
+    //   secret: process.env.NEXTAUTH_SECRET,
+    // })
+
+     const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+    cookieName: process.env.NODE_ENV === "production"
+        ? "__Secure-next-auth.session-token"
+        : "next-auth.session-token"
+})
 
     if (!token) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

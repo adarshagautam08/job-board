@@ -5,10 +5,18 @@ import { NextResponse ,NextRequest } from 'next/server'
 
 export async function POST(request:NextRequest)
 {
-    const token =await getToken({
-        req:request,
-        secret:process.env.NEXTAUTH_SECRET
-    })
+    // const token =await getToken({
+    //     req:request,
+    //     secret:process.env.NEXTAUTH_SECRET
+    // })
+
+     const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+    cookieName: process.env.NODE_ENV === "production"
+        ? "__Secure-next-auth.session-token"
+        : "next-auth.session-token"
+})
     if(!token)
     {
         return NextResponse.json(
