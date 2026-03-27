@@ -4,10 +4,17 @@ import { getToken } from "next-auth/jwt"
 
 export async function GET(request: NextRequest) {
   // 1️⃣ Get logged-in employer's ID from the token
-  const token = await getToken({
+  // const token = await getToken({
+  //   req: request,
+  //   secret: process.env.NEXTAUTH_SECRET
+  // })
+const token = await getToken({
     req: request,
-    secret: process.env.NEXTAUTH_SECRET
-  })
+    secret: process.env.NEXTAUTH_SECRET,
+    cookieName: process.env.NODE_ENV === "production"
+        ? "__Secure-next-auth.session-token"
+        : "next-auth.session-token"
+})
 
   if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
